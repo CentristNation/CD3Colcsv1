@@ -283,14 +283,12 @@
             <div class="section" id="selectionSection">
                 <div class="section-title">Selection Tools</div>
                 <div class="selection-tools">
-                    <button class="tool-button" id="bufferBtn" onclick="toggleBufferMode()">Buffer Select</button>
-                    <button class="tool-button" id="rectangleBtn" onclick="startRectangleSelection()">Rectangle</button>
-                    <button class="tool-button" id="polygonBtn" onclick="startPolygonSelection()">Polygon</button>
+                    <button class="tool-button" onclick="enableShiftClick()">Multi-Select</button>
+                    <button class="tool-button" onclick="selectAllVisible()">Select All Visible</button>
                     <button class="tool-button" id="clearSelection" onclick="clearAllSelections()">Clear All</button>
                     <div class="mode-info" id="modeInfo">Click polygons to select</div>
-                    <div class="buffer-controls" id="bufferControls" style="display: none;">
-                        <input type="range" class="buffer-input" id="bufferRange" min="1" max="50" value="10">
-                        <div class="buffer-value" id="bufferValue">10 miles</div>
+                    <div style="font-size: 10px; color: #888; margin-top: 5px; text-align: center;">
+                        Hold Shift + Click for multiple selection
                     </div>
                 </div>
             </div>
@@ -309,15 +307,19 @@
             </div>
             
             <div class="section" id="filterSection">
-                <div class="section-title">Filters (Min %)</div>
+                <div class="section-title">Filters (Range %)</div>
                 
                 <div class="filter-item">
                     <div class="filter-label">
                         <div class="party-icon dem-icon">D</div>
                         Democratic %
                     </div>
-                    <input type="range" class="filter-slider" id="demSlider" min="0" max="100" value="0">
-                    <div class="filter-value" id="demValue">Show areas ≥ 0%</div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="range" class="filter-slider" id="demSliderMin" min="0" max="100" value="0" style="flex: 1;">
+                        <span style="font-size: 10px;">to</span>
+                        <input type="range" class="filter-slider" id="demSliderMax" min="0" max="100" value="100" style="flex: 1;">
+                    </div>
+                    <div class="filter-value" id="demValue">0% - 100%</div>
                 </div>
                 
                 <div class="filter-item">
@@ -325,38 +327,62 @@
                         <div class="party-icon rep-icon">R</div>
                         Republican %
                     </div>
-                    <input type="range" class="filter-slider" id="repSlider" min="0" max="100" value="0">
-                    <div class="filter-value" id="repValue">Show areas ≥ 0%</div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="range" class="filter-slider" id="repSliderMin" min="0" max="100" value="0" style="flex: 1;">
+                        <span style="font-size: 10px;">to</span>
+                        <input type="range" class="filter-slider" id="repSliderMax" min="0" max="100" value="100" style="flex: 1;">
+                    </div>
+                    <div class="filter-value" id="repValue">0% - 100%</div>
                 </div>
                 
                 <div class="filter-item">
                     <div class="filter-label">Turnout %</div>
-                    <input type="range" class="filter-slider" id="turnoutSlider" min="0" max="100" value="0">
-                    <div class="filter-value" id="turnoutValue">Show areas ≥ 0%</div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="range" class="filter-slider" id="turnoutSliderMin" min="0" max="100" value="0" style="flex: 1;">
+                        <span style="font-size: 10px;">to</span>
+                        <input type="range" class="filter-slider" id="turnoutSliderMax" min="0" max="100" value="100" style="flex: 1;">
+                    </div>
+                    <div class="filter-value" id="turnoutValue">0% - 100%</div>
                 </div>
                 
                 <div class="filter-item">
                     <div class="filter-label">White %</div>
-                    <input type="range" class="filter-slider" id="whiteSlider" min="0" max="100" value="0">
-                    <div class="filter-value" id="whiteValue">Show areas ≥ 0%</div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="range" class="filter-slider" id="whiteSliderMin" min="0" max="100" value="0" style="flex: 1;">
+                        <span style="font-size: 10px;">to</span>
+                        <input type="range" class="filter-slider" id="whiteSliderMax" min="0" max="100" value="100" style="flex: 1;">
+                    </div>
+                    <div class="filter-value" id="whiteValue">0% - 100%</div>
                 </div>
                 
                 <div class="filter-item">
                     <div class="filter-label">Black %</div>
-                    <input type="range" class="filter-slider" id="blackSlider" min="0" max="100" value="0">
-                    <div class="filter-value" id="blackValue">Show areas ≥ 0%</div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="range" class="filter-slider" id="blackSliderMin" min="0" max="100" value="0" style="flex: 1;">
+                        <span style="font-size: 10px;">to</span>
+                        <input type="range" class="filter-slider" id="blackSliderMax" min="0" max="100" value="100" style="flex: 1;">
+                    </div>
+                    <div class="filter-value" id="blackValue">0% - 100%</div>
                 </div>
                 
                 <div class="filter-item">
                     <div class="filter-label">Hispanic %</div>
-                    <input type="range" class="filter-slider" id="hispanicSlider" min="0" max="100" value="0">
-                    <div class="filter-value" id="hispanicValue">Show areas ≥ 0%</div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="range" class="filter-slider" id="hispanicSliderMin" min="0" max="100" value="0" style="flex: 1;">
+                        <span style="font-size: 10px;">to</span>
+                        <input type="range" class="filter-slider" id="hispanicSliderMax" min="0" max="100" value="100" style="flex: 1;">
+                    </div>
+                    <div class="filter-value" id="hispanicValue">0% - 100%</div>
                 </div>
                 
                 <div class="filter-item">
                     <div class="filter-label">Asian %</div>
-                    <input type="range" class="filter-slider" id="asianSlider" min="0" max="100" value="0">
-                    <div class="filter-value" id="asianValue">Show areas ≥ 0%</div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="range" class="filter-slider" id="asianSliderMin" min="0" max="100" value="0" style="flex: 1;">
+                        <span style="font-size: 10px;">to</span>
+                        <input type="range" class="filter-slider" id="asianSliderMax" min="0" max="100" value="100" style="flex: 1;">
+                    </div>
+                    <div class="filter-value" id="asianValue">0% - 100%</div>
                 </div>
             </div>
             
@@ -434,12 +460,7 @@
         let map, geoJsonLayer, selectedFeatures = [];
         let originalData = null;
         let voterData = null;
-        let drawnItems = null;
-        let drawControl = null;
-        let isBufferMode = false;
-        let activeDrawingMode = null;
         let selectedPrecincts = new Set();
-        let bufferRadius = 10;
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
@@ -948,35 +969,58 @@
             }
         }
 
-        // Setup filters
+        // Setup filters with range support
         function setupFilters() {
             const filters = ['dem', 'rep', 'turnout', 'white', 'black', 'hispanic', 'asian'];
             
             filters.forEach(filter => {
-                const slider = document.getElementById(filter + 'Slider');
+                const sliderMin = document.getElementById(filter + 'SliderMin');
+                const sliderMax = document.getElementById(filter + 'SliderMax');
                 const value = document.getElementById(filter + 'Value');
                 
-                if (slider && value) {
-                    slider.addEventListener('input', function() {
-                        value.textContent = `Show areas ≥ ${this.value}%`;
+                function updateFilterValue() {
+                    if (sliderMin && sliderMax && value) {
+                        const min = parseInt(sliderMin.value);
+                        const max = parseInt(sliderMax.value);
+                        
+                        // Ensure min doesn't exceed max
+                        if (min > max) {
+                            if (event.target === sliderMin) {
+                                sliderMax.value = min;
+                            } else {
+                                sliderMin.value = max;
+                            }
+                        }
+                        
+                        value.textContent = `${Math.min(min, max)}% - ${Math.max(min, max)}%`;
                         applyAllFilters();
-                    });
+                    }
                 }
+                
+                if (sliderMin) sliderMin.addEventListener('input', updateFilterValue);
+                if (sliderMax) sliderMax.addEventListener('input', updateFilterValue);
             });
         }
 
-        // Apply all filters
+        // Apply all filters with range support
         function applyAllFilters() {
             if (!originalData) return;
             
             const filters = {
-                dem: parseInt(document.getElementById('demSlider').value) / 100,
-                rep: parseInt(document.getElementById('repSlider').value) / 100,
-                turnout: parseInt(document.getElementById('turnoutSlider').value) / 100,
-                white: parseInt(document.getElementById('whiteSlider').value) / 100,
-                black: parseInt(document.getElementById('blackSlider').value) / 100,
-                hispanic: parseInt(document.getElementById('hispanicSlider').value) / 100,
-                asian: parseInt(document.getElementById('asianSlider').value) / 100
+                demMin: parseInt(document.getElementById('demSliderMin').value) / 100,
+                demMax: parseInt(document.getElementById('demSliderMax').value) / 100,
+                repMin: parseInt(document.getElementById('repSliderMin').value) / 100,
+                repMax: parseInt(document.getElementById('repSliderMax').value) / 100,
+                turnoutMin: parseInt(document.getElementById('turnoutSliderMin').value) / 100,
+                turnoutMax: parseInt(document.getElementById('turnoutSliderMax').value) / 100,
+                whiteMin: parseInt(document.getElementById('whiteSliderMin').value) / 100,
+                whiteMax: parseInt(document.getElementById('whiteSliderMax').value) / 100,
+                blackMin: parseInt(document.getElementById('blackSliderMin').value) / 100,
+                blackMax: parseInt(document.getElementById('blackSliderMax').value) / 100,
+                hispanicMin: parseInt(document.getElementById('hispanicSliderMin').value) / 100,
+                hispanicMax: parseInt(document.getElementById('hispanicSliderMax').value) / 100,
+                asianMin: parseInt(document.getElementById('asianSliderMin').value) / 100,
+                asianMax: parseInt(document.getElementById('asianSliderMax').value) / 100
             };
             
             const filteredData = {
@@ -990,21 +1034,29 @@
                         return false;
                     }
                     
-                    // Demographic filters
-                    return (props.Dem_pct || 0) >= filters.dem &&
-                           (props.Rep_pct || 0) >= filters.rep &&
-                           (props.turn_pct || 0) >= filters.turnout &&
-                           (props.White_Vap_pct || 0) >= filters.white &&
-                           (props.Black_Vap_pct || 0) >= filters.black &&
-                           (props.Hispanic_Vap_pct || 0) >= filters.hispanic &&
-                           (props.Asian_Vap_pct || 0) >= filters.asian;
+                    // Range filters
+                    const demPct = props.Dem_pct || 0;
+                    const repPct = props.Rep_pct || 0;
+                    const turnoutPct = props.turn_pct || 0;
+                    const whitePct = props.White_Vap_pct || 0;
+                    const blackPct = props.Black_Vap_pct || 0;
+                    const hispanicPct = props.Hispanic_Vap_pct || 0;
+                    const asianPct = props.Asian_Vap_pct || 0;
+                    
+                    return demPct >= filters.demMin && demPct <= filters.demMax &&
+                           repPct >= filters.repMin && repPct <= filters.repMax &&
+                           turnoutPct >= filters.turnoutMin && turnoutPct <= filters.turnoutMax &&
+                           whitePct >= filters.whiteMin && whitePct <= filters.whiteMax &&
+                           blackPct >= filters.blackMin && blackPct <= filters.blackMax &&
+                           hispanicPct >= filters.hispanicMin && hispanicPct <= filters.hispanicMax &&
+                           asianPct >= filters.asianMin && asianPct <= filters.asianMax;
                 })
             };
             
             loadGeoJSON(filteredData);
             selectedFeatures = [];
             updateSummary();
-            updateVoterStats(); // Update voter stats when filters change
+            updateVoterStats();
         }
 
         // Get color for Democratic percentage
@@ -1040,7 +1092,7 @@
             };
         }
 
-        // Load GeoJSON onto map
+        // Load GeoJSON onto map with improved click handling
         function loadGeoJSON(geojson) {
             if (geoJsonLayer) {
                 map.removeLayer(geoJsonLayer);
@@ -1058,12 +1110,11 @@
                         <strong>Dem %:</strong> ${demPct.toFixed(1)}%
                     `);
 
-                    layer.originalClickHandler = function(e) {
-                        toggleFeatureSelection(feature, layer);
+                    // Enhanced click handler with shift support
+                    layer.on('click', function(e) {
+                        toggleFeatureSelection(feature, layer, e);
                         L.DomEvent.stopPropagation(e);
-                    };
-
-                    layer.on('click', layer.originalClickHandler);
+                    });
                 }
             }).addTo(map);
 
